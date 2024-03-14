@@ -1,7 +1,8 @@
-import os
 import tkinter
 import tkintermapview
 import random as ran
+from geopy.distance import geodesic
+import numpy as np
 # create tkinter window
 root_tk = tkinter.Tk()
 root_tk.geometry(f"{1000}x{700}")
@@ -39,8 +40,6 @@ xk=[]
 yk=[]
 
 
-# geocoordinates_lan=[]
-# geocoordinates_lat=[]
 #создание заказов
 for i in range(n):
     z=[]
@@ -48,28 +47,26 @@ for i in range(n):
     ya=ran.randint(min_lat,max_lat)
     xb=ran.randint(min_lan,max_lan)
     yb=ran.randint(min_lat,max_lat)
+    sum=ran.randint(1000,3000)
 
     zxA.append(xa)
     zyA.append(ya)
     zxB.append(xb)
     zyB.append(yb)
+    
     z.append(xa)
     z.append(ya)
     z.append(xb)
     z.append(yb)
+    z.append(sum)
     zakazy.append(z)
-    generate_lan=xa
-    generate_lat=ya
-    # geocoordinates_lan.append(generate_lan)
-    # geocoordinates_lat.append(generate_lat)
+
 print('заказы=',zakazy)   
 
 for i in range(n):    
     marker_3 = map_widget.set_marker(zxA[i]/10**6, zyA[i]/10**6, text=f"Заказ A #{i+1}", command=marker_callback)
     marker_3 = map_widget.set_marker(zxB[i]/10**6, zyB[i]/10**6, text=f"Заказ B #{i+1}", command=marker_callback)
 #создание курьеров
-# geocoordinates_lan_kurier=[]
-# geocoordinates_lat_kurier=[]
 for i in range(kk):
     k=[]
     
@@ -83,10 +80,7 @@ for i in range(kk):
     
     kuriery.append(k)
 
-    generate_lan_kurier=xk1
-    generate_lat_kurier=yk1
-    # geocoordinates_lan_kurier.append(generate_lan_kurier)
-    # geocoordinates_lat_kurier.append(generate_lat_kurier)
+
 print('курьеры=',kuriery)    
 
 for i in range(3):    
@@ -101,9 +95,12 @@ while len(list_ne_vzyatyh_zakazov)!=0:
     for j in range(kk):
         min=1000000000000
         for i in range(n):
-            r=((xk[j]-zxA[i])**2+(yk[j]-zyA[i])**2)**(1/2)
-            if (min > r) and (i in list_ne_vzyatyh_zakazov) : 
-                min=r
+            mark1 = (xk[j]/10**6, yk[j]/10**6)
+            mark2 = (zxA[i]/10**6, zyA[i]/10**6)
+            dist=geodesic(mark1, mark2, ellipsoid='WGS-84').m
+            print('dist=',dist)
+            if (min > dist) and (i in list_ne_vzyatyh_zakazov) : 
+                min=dist
                 ind=i
         list_ne_vzyatyh_zakazov.remove(ind) 
         print('курьер=',j+1,'заказ=',ind+1)
